@@ -111,12 +111,21 @@ package body MicroBit.Music is
 
    procedure Play (Pin : Pin_Id; M : Melody) is
    begin
+
+      StopSignal := False;
+
       for N of M loop
          Play (Pin, N);
+         exit when StopSignal;
       end loop;
 
       Set (Pin, False); --stop
    end Play;
+
+   Procedure StopMusic is
+   begin
+      StopSignal := True;
+   end;
 
 begin
    -- Initialize PWM

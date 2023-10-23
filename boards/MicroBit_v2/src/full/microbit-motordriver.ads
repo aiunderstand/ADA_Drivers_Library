@@ -34,6 +34,7 @@ with HAL;     use HAL;
 package MicroBit.MotorDriver is
 
    type Directions is (Forward,
+                       Backward,
                        Left,
                        Right,
                        Forward_Left,

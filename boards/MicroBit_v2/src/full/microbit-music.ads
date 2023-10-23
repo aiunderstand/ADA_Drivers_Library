@@ -52,9 +52,12 @@ package MicroBit.Music is
 
    Volume : Analog_Value := 20;
    IsPlaying : Boolean := False;
+   StopSignal : Boolean := False;
    procedure VolumeUp;
 
    procedure VolumeDown;
+
+   Procedure StopMusic;
 
    --  Predefined notes --
 
