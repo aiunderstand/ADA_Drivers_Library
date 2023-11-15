@@ -47,7 +47,7 @@ package body MicroBit.Accelerometer is
          MicroBit.I2C.Initialize;
       end if;
 
-      Acc.Configure (LSM303AGR.Freq_400);
+      Acc.Configure (LSM303AGR.Freq_400, LSM303AGR.Freq_10, LSM303AGR.Continuous_Mode);
    end Initialize;
 
    ----------

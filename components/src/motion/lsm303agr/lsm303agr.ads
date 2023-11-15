@@ -45,6 +45,12 @@ package LSM303AGR is
      (PowerDown, Freq_1, Freq_10, Freq_25, Freq_50, Freq_100, Freq_200,
       Freq_400, Low_Power, Hi_Res_1k6_Low_power_5k3);
 
+   type Data_Rate_Mag is
+     (Freq_10, Freq_20, Freq_50, Freq_100);
+
+   type System_Mode_Mag is
+   (Continuous_Mode, Single_Mode, Idle_Mode);
+
    type Axis_Data is range -2**9 .. 2**9 - 1 with Size => 10; -- we decimate from 16 (the output of the accel device) to 10 bits? Why?
                                                               -- Does this mean that the actual range is -512 .. 511?
 
@@ -70,7 +76,10 @@ package LSM303AGR is
    function Check_Magnetometer_Device_Id
      (This : LSM303AGR_Accelerometer) return Boolean;
 
-   procedure Configure (This : LSM303AGR_Accelerometer; Date_Rate : Data_Rate);
+   procedure Configure (This : LSM303AGR_Accelerometer;
+                        DR : Data_Rate;
+                        DR_Mag : Data_Rate_Mag;
+                        SM_Mag : System_Mode_Mag);
 
    function Read_Accelerometer
      (This : LSM303AGR_Accelerometer) return All_Axes_Data;
@@ -94,6 +103,12 @@ private
       Freq_100 => 5, Freq_200 => 6, Freq_400 => 7, Low_Power => 8,
       Hi_Res_1k6_Low_power_5k3 => 9);
 
+   for Data_Rate_Mag use
+     (Freq_10 => 0, Freq_20 => 1, Freq_50 => 2, Freq_100 => 3);
+
+   for System_Mode_Mag use
+      (Continuous_Mode => 0, Single_Mode => 1, Idle_Mode=> 2);
+
    Accelerometer_Address   : constant I2C_Address       := 16#32#;
    Accelerometer_Device_Id : constant Device_Identifier := 2#0011_0011#;
 
@@ -109,6 +124,10 @@ private
    CTRL_REG4_A : constant Register_Address := 16#23#;
    CTRL_REG5_A : constant Register_Address := 16#24#;
    CTRL_REG6_A : constant Register_Address := 16#25#;
+
+
+   CFG_REG_A_M : constant Register_Address := 16#60#;
+
 
    DATACAPTURE_A : constant Register_Address := 16#26#;
    STATUS_REG_A  : constant Register_Address := 16#27#;
@@ -180,5 +199,30 @@ private
      (STATUS_REG_A_Register, UInt8);
    function To_Reg is new Ada.Unchecked_Conversion
      (UInt8, STATUS_REG_A_Register);
+
+
+   ----Magnetometer
+   type CFG_REG_A_M_Register is record
+      MD           : UInt2 := 0;
+      ODR          : UInt2 := 0;
+      LP           : Bit   := 0;
+      SOFT_RST     : Bit   := 0;
+      REBOOT       : Bit   := 0;
+      COMP_TEMP_EN : Bit   := 0;
+   end record;
+
+   for CFG_REG_A_M_Register use record
+      MD            at 0 range 0 .. 1;
+      ODR           at 0 range 2 .. 3;
+      LP            at 0 range 4 .. 4;
+      SOFT_RST      at 0 range 5 .. 5;
+      REBOOT        at 0 range 6 .. 6;
+      COMP_TEMP_EN  at 0 range 7 .. 7;
+   end record;
+
+     function To_UInt8 is new Ada.Unchecked_Conversion
+     (CFG_REG_A_M_Register, UInt8);
+   function To_Reg is new Ada.Unchecked_Conversion
+     (UInt8, CFG_REG_A_M_Register);
 
 end LSM303AGR;

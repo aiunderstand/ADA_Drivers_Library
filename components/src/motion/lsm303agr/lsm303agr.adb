@@ -47,27 +47,34 @@ package body LSM303AGR is
    function To_Multi_Byte_Read_Address
      (Register_Addr : Register_Address) return UInt16;
 
-   procedure Configure (This : LSM303AGR_Accelerometer; Date_Rate : Data_Rate)
+   procedure Configure (This : LSM303AGR_Accelerometer;
+                        DR : Data_Rate;
+                        DR_Mag : Data_Rate_Mag;
+                        SM_Mag : System_Mode_Mag)
    is
       CTRLA : CTRL_REG1_A_Register;
+      CTRLM : CFG_REG_A_M_Register;
    begin
       CTRLA.Xen  := 1;
       CTRLA.Yen  := 1;
       CTRLA.Zen  := 1;
       CTRLA.LPen := 0;
-      CTRLA.ODR  := Date_Rate'Enum_Rep;
+      CTRLA.ODR  := DR'Enum_Rep;
 
       This.Write_Register
         (Accelerometer_Address, CTRL_REG1_A, To_UInt8 (CTRLA));
 
-      --  CTRLA.Xen  := 0;
-      --  CTRLA.Yen  := 0;
-      --  CTRLA.Zen  := 0;
-      --  CTRLA.LPen := 0;
-      --  CTRLA.ODR  := 0;
-      --
-      --  This.Write_Register
-      --    (Magnetometer_Address, CFG_REG_A_M, To_UInt8 (CTRLA));
+      CTRLM.MD  := SM_Mag'Enum_Rep;
+      CTRLM.ODR  := DR_Mag'Enum_Rep;
+      CTRLM.LP  := 0;
+      CTRLM.SOFT_RST := 0;
+      CTRLM.REBOOT  := 0;
+      CTRLM.COMP_TEMP_EN  := 0;
+
+      This.Write_Register
+        (Magnetometer_Address,
+         CFG_REG_A_M,
+         To_UInt8 (CTRLM));
    end Configure;
 
    procedure Assert_Status (Status : I2C_Status);
