@@ -78,6 +78,7 @@ https://github.com/AdaCore/Lunar_Lander_Rotation_Demo)
  * [Demo of an Ada physics engine](https://github.com/Kidev/DemoAdaPhysics2D)
  * [High Integrity Sumobot: A fully functional sumobot written in Ada/SPARK](https://github.com/bosepchuk/High_Integrity_Sumobot)
  * [RC Car: A remotely-controlled car built without the NXT Brick, written completely in Ada and SPARK](https://github.com/AdaCore/RC_Car_Demo)
+ * [Project Template for VS Code and MicroBit v2](https://github.com/aiunderstand/Ada-Embedded-Project-MicroBitV2)
 
 (Add yours to the list!)
 
