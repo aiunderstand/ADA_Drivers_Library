@@ -32,6 +32,13 @@
 with LSM303AGR;
 
 package MicroBit.Accelerometer is
+   MagMinX : Float := -1.0 ; -- -32767.0;
+   MagMinY : Float := -6.0 ; -- -32767.0;
+   MagMinZ : Float := -8.0;    --  -32767.0;
+
+   MagMaxX : Float :=  11.0 ; -- 32767.0;
+   MagMaxY : Float :=  7.0; -- 32767.0;
+   MagMaxZ : Float :=  4.0; -- 32767.0;
 
    function AccelDataRaw return LSM303AGR.All_Axes_Data_Raw;
 
@@ -41,4 +48,14 @@ package MicroBit.Accelerometer is
    function MagData return LSM303AGR.All_Axes_Data;
    --  Return the magneto value for each of the three axes (X, Y, Z)
 
+   function Map ( Value : Float;
+                  A1 : Float; -- Range Min (from)
+                  A2 : Float; -- Range Max (from)
+                  B1 : Float; -- Range Min (to)
+                  B2 : Float -- Range Max (to)
+                ) return Float;
+   -- Return mapped value
+
+   function Heading return LSM303AGR.Angle;
+   -- Return the heading based on the magnetometer
 end MicroBit.Accelerometer;

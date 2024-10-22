@@ -28,9 +28,9 @@
 --   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.   --
 --                                                                          --
 ------------------------------------------------------------------------------
-
 with MicroBit.I2C;
-
+with Ada.Numerics; use Ada.Numerics;
+with Ada.Numerics.Generic_Elementary_Functions;
 package body MicroBit.Accelerometer is
 
    Acc  : LSM303AGR.LSM303AGR_Accelerometer (MicroBit.I2C.Controller);
@@ -47,7 +47,7 @@ package body MicroBit.Accelerometer is
          MicroBit.I2C.Initialize;
       end if;
 
-      Acc.Configure (LSM303AGR.Freq_400, LSM303AGR.Freq_10, LSM303AGR.Continuous_Mode);
+      Acc.Configure (LSM303AGR.Freq_400, LSM303AGR.Freq_100, LSM303AGR.Continuous_Mode);
    end Initialize;
 
    ----------
@@ -62,6 +62,48 @@ package body MicroBit.Accelerometer is
 
    function MagData return LSM303AGR.All_Axes_Data
    is (Acc.Read_Magnetometer);
+
+   --Based on https://rosettacode.org/wiki/Map_range#Ada
+   function Map ( Value : Float;
+                  A1 : Float; -- Range Min (from)
+                  A2 : Float; -- Range Max (from)
+                  B1 : Float; -- Range Min (to)
+                  B2 : Float -- Range Max (to)
+                ) return Float is
+   begin
+      return B1 + (Value - A1) * (B2 - B1) / (A2 - A1);
+   end Map;
+
+   function Heading return LSM303AGR.Angle is
+      package test is new Generic_Elementary_Functions (Float_Type => Float);
+      Data : LSM303AGR.All_Axes_Data;
+      Result: Float;
+      X : Float;
+      Y : Float;
+      Z : Float;
+      Angle : Integer;
+   begin
+      --get raw sensor data
+      Data := MagData;
+      X := Float (Data.X);
+      Y := Float (Data.Y);
+      Z := Float (Data.Z);
+
+      --map to known ranges using calibrated values (or 0 for using factory default)
+      --it is up to the programmer to call calibrate first (although recommended)
+      X := Map(X, MagMinX, MagMaxX, -1023.0, 1023.0);
+      Y := Map(Y, MagMinY, MagMaxY, -1023.0, 1023.0);
+      Z := Map(Z, MagMinZ, MagMaxZ, 0.0, 1023.0);
+
+      --calc angle
+      Result := (Test.Arctan(Y, X) * 180.0) / Pi;
+      Result := Result + 90.0;
+
+      --normalize such we can cast to Angle.
+      Angle := Integer(Result) mod 360;
+
+      return LSM303AGR.Angle(Angle);
+   end Heading;
 
 begin
    Initialize;

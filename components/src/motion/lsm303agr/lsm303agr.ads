@@ -54,6 +54,7 @@ package LSM303AGR is
    type Axis_Data is range -2**9 .. 2**9 - 1 with Size => 10; -- we decimate from 16 (the output of the accel device) to 10 bits? Why?
                                                               -- Does this mean that the actual range is -512 .. 511?
 
+   type Angle is range 0 .. 360;
    type Axis_Data_Raw is record
       Low : UInt8;
       High : UInt8;
